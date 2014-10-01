@@ -1,29 +1,26 @@
-'use strict'
+﻿var express = require("express"),
+    app = express(),
+    bodyParser = require("body-parser"),
+    methodOverride = require("method-override"),
+    mongoose = require('mongoose');
 
-var express = require('express');
-var mongoskin = require('mongoskin');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(methodOverride());
 
-// Inicializamos la base de datos
-var db = mongoskin.db("//CONNECTIONSTRING ", {safe: true})
-db.bind("Series");
-
-//Inicializamos el servidor
-var app = express();
-
-app.use(express.static(__dirname + '/public'));
-
-// Definición de las rutas
-app.get('/api/serie/:id', function (req, res) {
-	db.Series.findOne({ _id: parseInt(req.params.id)}, function(err, serie) {
-		res.json(serie);
-	});
-})
-
-app.get('/api/serie', function(req, res) {
-	db.Series.find().toArray(function(err,items) {
-		res.json(items);
-	});	
+app.get('/', function (req, res) {
+    res.send("Hello world!");
 });
 
-// Esuchamos las peticiones para procesarlas
-app.listen(process.env.PORT || 3000);
+routes = require('./controllers/tvshows')(app);
+
+// Connection to DB
+mongoose.connect('mongodb://MongoLab-wy:wNGd2KKc.KUMZv4V185dh6MQ8nH7rO1yzsiC4iaGabY-@ds052827.mongolab.com:52827/MongoLab-wy', function (err, res) {
+    if (err) throw err;
+    console.log('Connected to Database');
+});
+
+
+app.listen(3000, function () {
+    console.log("Node server running on http://localhost:3000");
+});
